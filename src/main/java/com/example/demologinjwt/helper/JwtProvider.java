@@ -25,18 +25,18 @@ public class JwtProvider {
     private Gson gson = new Gson();
 
     // Hàm khởi tạo token, nhận vào data muốn lưu vào Token (data kiểu GSon/String...)
-    public String generateToken(String data){
+    public String generateToken(User user){
 
         // Token hết hạn từ thời điểm được tạo ra + thời gian sống
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + JWT_EXPIRED);
 
         // Biến Object thành JSon
-         String json = gson.toJson(data);
+         String json = gson.toJson(user);
 
         return Jwts.builder()
                 // Truyền data muốn lưu kèm ở Token vào
-                .setSubject(data)
+                .setSubject(json)
                 // Thời gian tạo
                 .setIssuedAt(now)
                 // Thời gian hết hạn

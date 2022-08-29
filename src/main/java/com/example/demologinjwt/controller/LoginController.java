@@ -41,7 +41,12 @@ public class LoginController {
 
         // Hợp lệ thì tạo Token, dùng jwtProvider.generateToken nhận vào
         // data muốn lưu vào Token (data kiểu GSon/String...)
-        String jwtToken = jwtProvider.generateToken(loginRequest.getUserName());
+
+        // Chỉ lưu UserName
+        // String jwtToken = jwtProvider.generateToken(loginRequest.getUserName());
+
+        // Lưu nguyên User
+        String jwtToken = jwtProvider.generateToken((User) authentication.getPrincipal());
         return new ResponseEntity<String>(jwtToken, HttpStatus.OK);
     }
 

@@ -21,6 +21,7 @@ import java.io.IOException;
 
 public class JwtAuthFilter extends OncePerRequestFilter {
 
+    // Lấy jwtProvider để sử dụng các phương thức xử lý với Token
     @Autowired
     JwtProvider jwtProvider;
 
@@ -36,22 +37,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        // gọi hàm getJwtToken, nhận vào request và trả ra Token của request nếu có
         String token = getJwtToken(request);
+
+        // Kiểm tra tính hợp lệ của Token
         if(jwtProvider.validationToken(token)){
-            // Token hợp lệ
+            // Token hợp lệ thì tiến hàng giải mã
             String jsonData = jwtProvider.decodeToken(token);
-            User user = gson.fromJson(jsonData, User.class);
+            System.out.println("Data Decode Token: " + jsonData);
+
+            // Biến JSon thành User (Thư viện GSon)
+            // User user = gson.fromJson(jsonData, User.class);
             User userDetail = (User) userService.loadUserByUsername("admin");
 
             // Gọi lại hàm đăng nhập mặc định của Spring Security
             UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                    new UsernamePasswordAuthenticationToken(userDetail, null, userDetail.getAuthorities());
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
-            System.out.println("Kiem tra data token: " + jsonData);
-
 
         } else {
             // Token không phải do hệ thống sinh ra
@@ -62,13 +66,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    // Hàm lấy Token từ Header nằm trong Request mà user truyền lên
     private String getJwtToken(HttpServletRequest request){
+        // Tên Header chứa Token là Authorization (Lưu theo định dạng: "Authorization: Bearer <Token>")
         String authenToken = request.getHeader("Authorization");
+
+        // Kiểm tra null và chứa value theo định dạng "Bearer <Token>"
         if(StringUtils.hasText(authenToken) && authenToken.contains("Bearer")){
             // Loại bỏ chữ Bearer và lấy phần token
             String token = authenToken.substring(7);
             return token;
         }
+
+        // Không có Token thì trả null
         return null;
     }
 }

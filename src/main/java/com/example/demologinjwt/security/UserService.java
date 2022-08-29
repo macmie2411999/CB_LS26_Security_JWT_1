@@ -24,6 +24,6 @@ public class UserService implements UserDetailsService {
         // Tạo tiếp class CustomUserDetails implements UserDetails chứa instance userPojo
         User user = new User("admin",
                 "$2a$12$KLs3oadjXE0.8l2015vLdu5Uo2HElb2zazlBcF8gyCHEpEnCbJDzm", roles);
-        return null;
+        return user;
     }
 }

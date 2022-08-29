@@ -60,11 +60,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // cors: Không cho phép truy cập vào tài nguyên nếu không đúng domain, mặc định enable
                 // Vì enable nên nếu không quy định domain nào được phép gọi nó thì sẽ lỗi 403
                 .cors().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeHttpRequests()
+                // Khai báo không sử dụng Session
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                // Định nghĩa link chứng thực
+                .and().authorizeHttpRequests()
                 // Khi vào link login thì cho qua không cần Authen
                 .antMatchers("/api/v1/login").permitAll()
                 .anyRequest().authenticated()
+                // Chạy filter jwtAuthFilter() trước filter chứng thực UsernamePasswordAuthenticationFilter
                 .and().addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 }
